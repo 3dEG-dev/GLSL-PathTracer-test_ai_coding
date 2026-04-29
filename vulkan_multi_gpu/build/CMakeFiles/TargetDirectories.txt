@@ -1,0 +1,3 @@
+/workspace/vulkan_multi_gpu/build/CMakeFiles/VulkanMultiGPUPathTracer.dir
+/workspace/vulkan_multi_gpu/build/CMakeFiles/edit_cache.dir
+/workspace/vulkan_multi_gpu/build/CMakeFiles/rebuild_cache.dir

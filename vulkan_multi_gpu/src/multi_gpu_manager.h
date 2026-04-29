@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <array>
 
 namespace vkpt {
 
@@ -18,9 +19,26 @@ struct RenderTile {
     bool completed;      // Fertigstellungsstatus
 };
 
+// Uniform Buffer Struktur für den Compute Shader
+struct UniformData {
+    uint32_t width;
+    uint32_t height;
+    uint32_t maxDepth;
+    uint32_t seed;
+    float cameraOrigin[3];
+    float cameraDir[3];
+    float cameraUp[3];
+    float fov;
+};
+
 // Per-GPU Ressourcen
 struct GPURenderResources {
     DeviceInfo deviceInfo;  // Copy instead of pointer to avoid const issues
+    
+    // Uniform Buffer
+    VkBuffer uniformBuffer;
+    VkDeviceMemory uniformBufferMemory;
+    void* mappedUniform;
     
     // Buffers für Scene Data (gestriped)
     VkBuffer sphereBuffer;
@@ -28,16 +46,17 @@ struct GPURenderResources {
     VkBuffer materialBuffer;
     VkDeviceMemory materialBufferMemory;
     
-    // Output Buffer (Tile Ergebnis)
-    VkBuffer outputBuffer;
-    VkDeviceMemory outputBufferMemory;
-    void* mappedOutput;  // CPU-zugänglicher Pointer
+    // Output Buffer (Tile Ergebnis) - als Image für den Shader
+    VkImage outputImage;
+    VkDeviceMemory outputImageMemory;
+    VkImageView outputImageView;
     
     // Compute Pipeline
     VkPipeline computePipeline;
     VkPipelineLayout pipelineLayout;
     VkDescriptorSet descriptorSet;
     VkDescriptorPool descriptorPool;
+    VkDescriptorSetLayout descriptorSetLayout;
     
     // Command Pool & Buffer
     VkCommandPool commandPool;
@@ -50,12 +69,15 @@ struct GPURenderResources {
     std::vector<RenderTile> assignedTiles;
     
     GPURenderResources() 
-        : sphereBuffer(VK_NULL_HANDLE), sphereBufferMemory(VK_NULL_HANDLE),
+        : uniformBuffer(VK_NULL_HANDLE), uniformBufferMemory(VK_NULL_HANDLE),
+          mappedUniform(nullptr),
+          sphereBuffer(VK_NULL_HANDLE), sphereBufferMemory(VK_NULL_HANDLE),
           materialBuffer(VK_NULL_HANDLE), materialBufferMemory(VK_NULL_HANDLE),
-          outputBuffer(VK_NULL_HANDLE), outputBufferMemory(VK_NULL_HANDLE),
-          mappedOutput(nullptr),
+          outputImage(VK_NULL_HANDLE), outputImageMemory(VK_NULL_HANDLE),
+          outputImageView(VK_NULL_HANDLE),
           computePipeline(VK_NULL_HANDLE), pipelineLayout(VK_NULL_HANDLE),
           descriptorSet(VK_NULL_HANDLE), descriptorPool(VK_NULL_HANDLE),
+          descriptorSetLayout(VK_NULL_HANDLE),
           commandPool(VK_NULL_HANDLE), fence(VK_NULL_HANDLE) {}
 };
 
@@ -97,8 +119,12 @@ private:
     // Helper Funktionen
     bool createComputePipeline(GPURenderResources& resources, const std::vector<uint32_t>& shaderCode);
     bool createDescriptorSet(GPURenderResources& resources);
+    bool createUniformBuffer(GPURenderResources& resources, uint32_t imageWidth, uint32_t imageHeight);
+    bool createOutputImage(GPURenderResources& resources, uint32_t width, uint32_t height);
     void distributeSceneData(const std::vector<Sphere>& spheres,
                             const std::vector<Material>& materials);
+    uint32_t findMemoryType(GPURenderResources& resources, uint32_t typeFilter, 
+                           VkMemoryPropertyFlags properties);
 };
 
 } // namespace vkpt
