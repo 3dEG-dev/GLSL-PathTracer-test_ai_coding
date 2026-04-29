@@ -140,7 +140,7 @@ std::vector<DeviceInfo> VulkanContext::enumerateDevices() {
     return result;
 }
 
-bool VulkanContext::createDevice(const DeviceInfo& info) {
+bool VulkanContext::createDevice(DeviceInfo& info) {
     float queuePriority = 1.0f;
     VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -167,6 +167,7 @@ bool VulkanContext::createDevice(const DeviceInfo& info) {
     }
     
     vkGetDeviceQueue(info.device, info.queueFamilyIndex, 0, &info.computeQueue);
+    
     return true;
 }
 

@@ -44,26 +44,26 @@ bool MultiGPUManager::initialize(VulkanContext& context, const std::vector<uint3
         }
         
         GPURenderResources resources;
-        resources.deviceInfo = &vulkanContext->getDevices()[index];
+        resources.deviceInfo = vulkanContext->getDevices()[index];  // Copy instead of pointer
         
         // Command Pool erstellen
         resources.commandPool = context.createCommandPool(
-            resources.deviceInfo->queueFamilyIndex, 
-            resources.deviceInfo->device);
+            resources.deviceInfo.queueFamilyIndex, 
+            resources.deviceInfo.device);
         
         // Fence erstellen
         VkFenceCreateInfo fenceInfo{};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;  // Start signaled
-        if (vkCreateFence(resources.deviceInfo->device, &fenceInfo, nullptr, &resources.fence) != VK_SUCCESS) {
+        if (vkCreateFence(resources.deviceInfo.device, &fenceInfo, nullptr, &resources.fence) != VK_SUCCESS) {
             std::cerr << "Failed to create fence!" << std::endl;
             continue;
         }
         
         gpuResources.push_back(std::move(resources));
         
-        std::cout << "Initialized GPU: " << resources.deviceInfo->name 
-                  << " (VRAM: " << (resources.deviceInfo->memorySize / (1024 * 1024)) << " MB)" << std::endl;
+        std::cout << "Initialized GPU: " << resources.deviceInfo.name 
+                  << " (VRAM: " << (resources.deviceInfo.memorySize / (1024 * 1024)) << " MB)" << std::endl;
     }
     
     if (gpuResources.empty()) {
@@ -77,7 +77,7 @@ bool MultiGPUManager::initialize(VulkanContext& context, const std::vector<uint3
 
 void MultiGPUManager::cleanup() {
     for (auto& resources : gpuResources) {
-        VkDevice device = resources.deviceInfo->device;
+        VkDevice device = resources.deviceInfo.device;
         
         // Resources freigeben
         if (resources.fence != VK_NULL_HANDLE) {
@@ -140,7 +140,7 @@ bool MultiGPUManager::setupScene(const std::vector<Sphere>& spheres,
     } else {
         // Alle Daten auf jede GPU kopieren (einfacher, aber mehr VRAM)
         for (auto& resources : gpuResources) {
-            VkDevice device = resources.deviceInfo->device;
+            VkDevice device = resources.deviceInfo.device;
             
             // Sphere Buffer
             VkDeviceSize sphereBufferSize = spheres.size() * sizeof(Sphere);
@@ -187,7 +187,7 @@ void MultiGPUManager::distributeSceneData(const std::vector<Sphere>& spheres,
     
     for (size_t gpuIdx = 0; gpuIdx < gpuResources.size(); ++gpuIdx) {
         auto& resources = gpuResources[gpuIdx];
-        VkDevice device = resources.deviceInfo->device;
+        VkDevice device = resources.deviceInfo.device;
         
         // Berechnen welcher Bereich dieser GPU zugewiesen wird
         size_t startIdx = gpuIdx * spheresPerGPU;
@@ -222,7 +222,7 @@ void MultiGPUManager::distributeSceneData(const std::vector<Sphere>& spheres,
             
             // Host-visible memory finden
             VkPhysicalDeviceMemoryProperties memProps;
-            vkGetPhysicalDeviceMemoryProperties(resources.deviceInfo->physicalDevice, &memProps);
+            vkGetPhysicalDeviceMemoryProperties(resources.deviceInfo.physicalDevice, &memProps);
             
             uint32_t memoryTypeIndex = 0;
             for (uint32_t i = 0; i < memProps.memoryTypeCount; i++) {
@@ -262,7 +262,7 @@ void MultiGPUManager::distributeSceneData(const std::vector<Sphere>& spheres,
             allocInfo.allocationSize = memReq.size;
             
             VkPhysicalDeviceMemoryProperties memProps;
-            vkGetPhysicalDeviceMemoryProperties(resources.deviceInfo->physicalDevice, &memProps);
+            vkGetPhysicalDeviceMemoryProperties(resources.deviceInfo.physicalDevice, &memProps);
             
             uint32_t memoryTypeIndex = 0;
             for (uint32_t i = 0; i < memProps.memoryTypeCount; i++) {
@@ -345,8 +345,8 @@ void MultiGPUManager::renderFrame(uint32_t imageWidth, uint32_t imageHeight, int
             continue;
         }
         
-        VkDevice device = resources.deviceInfo->device;
-        VkQueue queue = resources.deviceInfo->computeQueue;
+        VkDevice device = resources.deviceInfo.device;
+        VkQueue queue = resources.deviceInfo.computeQueue;
         
         // Fence warten (vom vorherigen Frame)
         vkWaitForFences(device, 1, &resources.fence, VK_TRUE, UINT64_MAX);
@@ -355,7 +355,7 @@ void MultiGPUManager::renderFrame(uint32_t imageWidth, uint32_t imageHeight, int
         // Command Buffer aufnehmen und ausführen für jedes Tile
         // (Vereinfacht: hier würde man den Compute Pipeline Dispatch machen)
         
-        std::cout << "  GPU " << resources.deviceInfo->deviceId 
+        std::cout << "  GPU " << resources.deviceInfo.deviceId 
                   << " processing " << resources.assignedTiles.size() << " tiles" << std::endl;
         
         // Hier würde der eigentliche Compute Dispatch erfolgen:
@@ -389,7 +389,7 @@ void MultiGPUManager::waitForAllGPUs() {
     }
     
     for (auto& resources : gpuResources) {
-        VkDevice device = resources.deviceInfo->device;
+        VkDevice device = resources.deviceInfo.device;
         vkWaitForFences(device, 1, &resources.fence, VK_TRUE, UINT64_MAX);
     }
 }

@@ -19,7 +19,7 @@ public:
 
     // Multi-GPU Unterstützung
     std::vector<DeviceInfo> enumerateDevices();
-    bool createDevice(const DeviceInfo& info);
+    bool createDevice(DeviceInfo& info);
     
     // Compute Pipeline
     bool createComputePipeline(const std::vector<uint32_t>& shaderCode);
