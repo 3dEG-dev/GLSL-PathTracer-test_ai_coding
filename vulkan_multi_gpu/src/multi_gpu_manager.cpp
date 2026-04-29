@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstring>
 #include <vector>
+#include <cstdio>
 
 namespace vkpt {
 
@@ -178,8 +179,9 @@ bool MultiGPUManager::initialize(VulkanContext& context, const std::vector<uint3
         
         gpuResources.push_back(std::move(resources));
         
-        std::cout << "Initialized GPU: " << resources.deviceInfo.name 
-                  << " (VRAM: " << (resources.deviceInfo.memorySize / (1024 * 1024)) << " MB)" << std::endl;
+        printf("Initialized GPU: %s (VRAM: %u MB)\n", 
+               resources.deviceInfo.name.c_str(), 
+               (unsigned int)(resources.deviceInfo.memorySize / (1024 * 1024)));
     }
     
     if (gpuResources.empty()) {
