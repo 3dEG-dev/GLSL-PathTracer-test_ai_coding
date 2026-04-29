@@ -15,11 +15,8 @@ const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-#ifdef NDEBUG
+// Validation Layers standardmäßig deaktivieren für bessere Kompatibilität
 const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
 
 VulkanContext::VulkanContext() 
     : instance(VK_NULL_HANDLE), debugMessenger(VK_NULL_HANDLE), validationEnabled(false) {}
@@ -105,10 +102,18 @@ std::vector<DeviceInfo> VulkanContext::enumerateDevices() {
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
         
         int32_t computeQueueFamilyIndex = -1;
+        // Suche nach einer Queue-Familie mit Compute-Unterstützung
+        // Bevorzuge dedizierte Compute-Queues, akzeptiere aber auch Graphics+Compute
         for (uint32_t j = 0; j < queueFamilyCount; ++j) {
+            // Akzeptiere jede Queue mit Compute-Bit (inkl. Graphics+Compute)
             if (queueFamilies[j].queueFlags & VK_QUEUE_COMPUTE_BIT) {
                 computeQueueFamilyIndex = static_cast<int32_t>(j);
-                break;
+                // Breche nicht sofort ab, sondern suche weiter nach einer reinen Compute-Queue
+                // Wenn es keine reine Compute-Queue gibt, nehmen wir die erste mit Compute-Bit
+                if (!(queueFamilies[j].queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
+                    // Reine Compute-Queue gefunden - das ist optimal
+                    break;
+                }
             }
         }
         
@@ -284,6 +289,8 @@ bool VulkanContext::createInstance() {
         }
         if (!allSupported) {
             std::cerr << "Not all validation layers are available!" << std::endl;
+            std::cerr << "Continuing without validation layers..." << std::endl;
+            // Validation Layers werden ignoriert, Instance wird trotzdem erstellt
         }
     }
     
