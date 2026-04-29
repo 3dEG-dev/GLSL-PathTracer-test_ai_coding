@@ -1,38 +1,13 @@
 ```
-# Compiled and build artifacts
+# Build artifacts
+vulkan_multi_gpu/build/
+# Compiled objects
 *.o
 *.obj
-*.exe
-*.dll
-*.so
-*.a
 *.out
-
-# Dependencies
-node_modules/
-venv/
-.venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-target/
-.gradle/
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
-
-# Build directories
-build/
-dist/
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 ```
