@@ -26,7 +26,9 @@
 #include "Renderer.h"
 #include "ShaderIncludes.h"
 #include "Scene.h"
+#ifndef __linux__
 #include "OpenImageDenoise/oidn.hpp"
+#endif
 
 namespace GLSLPT
 {
@@ -692,6 +694,7 @@ namespace GLSLPT
         }
 
         // Denoise image if requested
+#ifndef __linux__
         if (scene->renderOptions.enableDenoiser && sampleCounter > 1)
         {
             if (!denoised || (frameCounter % (scene->renderOptions.denoiserFrameCnt * (numTiles.x * numTiles.y)) == 0))
@@ -726,6 +729,13 @@ namespace GLSLPT
                 denoised = true;
             }
         }
+#else
+        // Denoiser not available on Linux
+        if (scene->renderOptions.enableDenoiser)
+        {
+            std::cout << "Denoiser is not available on Linux" << std::endl;
+        }
+#endif
         else
             denoised = false;
 
