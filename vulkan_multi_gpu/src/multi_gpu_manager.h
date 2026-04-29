@@ -20,7 +20,7 @@ struct RenderTile {
 
 // Per-GPU Ressourcen
 struct GPURenderResources {
-    DeviceInfo* deviceInfo;
+    DeviceInfo deviceInfo;  // Copy instead of pointer to avoid const issues
     
     // Buffers für Scene Data (gestriped)
     VkBuffer sphereBuffer;
@@ -50,8 +50,7 @@ struct GPURenderResources {
     std::vector<RenderTile> assignedTiles;
     
     GPURenderResources() 
-        : deviceInfo(nullptr), 
-          sphereBuffer(VK_NULL_HANDLE), sphereBufferMemory(VK_NULL_HANDLE),
+        : sphereBuffer(VK_NULL_HANDLE), sphereBufferMemory(VK_NULL_HANDLE),
           materialBuffer(VK_NULL_HANDLE), materialBufferMemory(VK_NULL_HANDLE),
           outputBuffer(VK_NULL_HANDLE), outputBufferMemory(VK_NULL_HANDLE),
           mappedOutput(nullptr),

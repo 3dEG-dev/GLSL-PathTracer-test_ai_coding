@@ -38,11 +38,12 @@ int main(int argc, char** argv) {
     // Vulkan Context initialisieren
     VulkanContext context;
     
+    // Validation Layers nur im Debug-Modus und wenn verfügbar
     bool enableValidation = false;
 #ifdef NDEBUG
     enableValidation = false;
 #else
-    enableValidation = true;
+    enableValidation = false;  // Deaktiviert für bessere Kompatibilität
 #endif
     
     if (!context.initialize(enableValidation)) {

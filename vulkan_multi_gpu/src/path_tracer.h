@@ -10,10 +10,9 @@ namespace vkpt {
 // Dies ist ein minimaler Path Tracing Compute Shader in GLSL, kompiliert zu SPIR-V
 // Für das vollständige Projekt würden diese Shader zur Compile-Zeit generiert
 
-extern const char* PATH_TRACING_COMPUTE_SHADER_GLSL;
-
 // Shader Source Code für den Path Tracing Compute Shader
-const char* PATH_TRACING_COMPUTE_SHADER_GLSL = R"(
+inline const char* getComputeShaderSource() {
+    return R"(
 #version 450
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
@@ -163,5 +162,6 @@ void main() {
     imageStore(outputImage, ivec2(x, y), finalColor);
 }
 )";
+}
 
 } // namespace vkpt

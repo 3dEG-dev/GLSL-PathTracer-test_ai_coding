@@ -69,6 +69,10 @@ struct DeviceInfo {
     uint32_t deviceId;
     std::string name;
     uint64_t memorySize;  // Geschätzter VRAM
+    
+    DeviceInfo() : physicalDevice(VK_NULL_HANDLE), device(VK_NULL_HANDLE), 
+                   computeQueue(VK_NULL_HANDLE), queueFamilyIndex(0), 
+                   deviceId(0), memorySize(0) {}
 };
 
 } // namespace vkpt
