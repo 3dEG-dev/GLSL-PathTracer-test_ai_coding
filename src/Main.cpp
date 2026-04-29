@@ -565,6 +565,21 @@ int main(int argc, char** argv)
     {
         GetSceneFiles();
         GetEnvMaps();
+        
+        // Check if sceneFiles is empty before accessing
+        if (sceneFiles.empty())
+        {
+            printf("Error: No scene files found in assets directory!\n");
+            printf("Please ensure the assets directory contains .scene, .gltf, or .glb files.\n");
+            return -1;
+        }
+        
+        // Ensure sampleSceneIdx is within bounds
+        if (sampleSceneIdx < 0 || sampleSceneIdx >= (int)sceneFiles.size())
+        {
+            sampleSceneIdx = 0;
+        }
+        
         LoadScene(sceneFiles[sampleSceneIdx]);
     }
 
