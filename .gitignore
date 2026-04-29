@@ -1,1 +1,67 @@
-Nothing should be ignored in this case, as only a source code file (`vulkan_multi_gpu/src/multi_gpu_manager.cpp`) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
+```
+# CMake build artifacts
+build/
+cmake-build-*/
+
+# Compiler object files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+
+# Executables
+*.exe
+*.out
+
+# CMake specific files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Coverage reports
+coverage/
+htmlcov/
+
+# Python artifacts (if any Python files exist in the project)
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Build system directories
+dist/
+target/
+.gradle/
+
+# MyPy cache
+.mypy_cache/
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage
+.coverage
+```

@@ -41,6 +41,7 @@
 #include "boyTestScene.h"
 #include "ajaxTestScene.h"
 #include "cornellTestScene.h"
+#include "vulkan/vulkan_main.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -538,6 +539,9 @@ void MainLoop(void* arg)
 int main(int argc, char** argv)
 {
     srand((unsigned int)time(0));
+
+    // Vulkan Multi-GPU initialisieren und GPU-Namen ausgeben
+    InitVulkanMultiGPU();
 
     std::string sceneFile;
 

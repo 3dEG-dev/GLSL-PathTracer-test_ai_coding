@@ -19,6 +19,19 @@ file(GLOB_RECURSE SRC_FILES
     ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
 
+# Vulkan Multi-GPU Support
+list(APPEND SRC_FILES
+    ${CMAKE_SOURCE_DIR}/src/vulkan/vulkan_context.h
+    ${CMAKE_SOURCE_DIR}/src/vulkan/vulkan_context.cpp
+    ${CMAKE_SOURCE_DIR}/src/vulkan/multi_gpu_manager.h
+    ${CMAKE_SOURCE_DIR}/src/vulkan/multi_gpu_manager.cpp
+    ${CMAKE_SOURCE_DIR}/src/vulkan/path_tracer.h
+    ${CMAKE_SOURCE_DIR}/src/vulkan/path_tracer.cpp
+    ${CMAKE_SOURCE_DIR}/src/vulkan/scene.h
+    ${CMAKE_SOURCE_DIR}/src/vulkan/scene.cpp
+    ${CMAKE_SOURCE_DIR}/src/vulkan/types.h
+)
+
 file(GLOB_RECURSE EXT_FILES
     ${CMAKE_SOURCE_DIR}/thirdparty/stb/*.h
     ${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.h
@@ -57,6 +70,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/loaders
     ${CMAKE_SOURCE_DIR}/src/tests
     ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/vulkan
     ${CMAKE_SOURCE_DIR}/thirdparty/imgui
     ${CMAKE_SOURCE_DIR}/thirdparty/glew/include
     ${CMAKE_SOURCE_DIR}/thirdparty/stb
@@ -80,6 +94,7 @@ link_directories(
   ${OIDN_LIBDIR}
 )
 find_package(OpenGL)
+find_package(Vulkan REQUIRED)
 
 foreach(f ${SRCS})
     # Get the path of the file relative to ${DIRECTORY},
@@ -112,9 +127,9 @@ SET(EXE_NAME "PathTracer")
 ADD_EXECUTABLE(${EXE_NAME} ${SRCS})
 
 if(WIN32)
-TARGET_LINK_LIBRARIES(${EXE_NAME} ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES} ${OIDN_LIBRARIES})
+TARGET_LINK_LIBRARIES(${EXE_NAME} ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES} ${OIDN_LIBRARIES} Vulkan::Vulkan)
 else()
-TARGET_LINK_LIBRARIES(${EXE_NAME} ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES} ${OIDN_LIBRARIES} dl)
+TARGET_LINK_LIBRARIES(${EXE_NAME} ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES} ${OIDN_LIBRARIES} dl Vulkan::Vulkan)
 endif()
 
 #--------------------------------------------------------------------

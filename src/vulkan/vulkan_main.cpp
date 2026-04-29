@@ -27,7 +27,8 @@ std::vector<uint32_t> loadShaderCode(const char* filename) {
     return buffer;
 }
 
-int main(int argc, char** argv) {
+// Vulkan Multi-GPU Initialisierung und Demo-Funktion
+void InitVulkanMultiGPU() {
     std::cout << "=== Vulkan Multi-GPU Path Tracer ===" << std::endl;
     std::cout << "Unterstützung für:" << std::endl;
     std::cout << "  - Explizite Multi-GPU Steuerung" << std::endl;
@@ -48,13 +49,13 @@ int main(int argc, char** argv) {
     
     if (!context.initialize(enableValidation)) {
         std::cerr << "Failed to initialize Vulkan!" << std::endl;
-        return -1;
+        return;
     }
     
     const auto& devices = context.getDevices();
     if (devices.empty()) {
         std::cerr << "No Vulkan devices found!" << std::endl;
-        return -1;
+        return;
     }
     
     std::cout << "\nVerfügbare GPUs:" << std::endl;
@@ -74,7 +75,7 @@ int main(int argc, char** argv) {
     
     if (!gpuManager.initialize(context, deviceIndices)) {
         std::cerr << "Failed to initialize Multi-GPU Manager!" << std::endl;
-        return -1;
+        return;
     }
     
     std::cout << "\nMulti-GPU Manager initialisiert mit " << gpuManager.getGPUCount() << " GPU(s)" << std::endl;
@@ -90,7 +91,7 @@ int main(int argc, char** argv) {
     bool distributeData = (gpuManager.getGPUCount() > 1);
     if (!gpuManager.setupScene(scene.getSpheres(), scene.getMaterials(), distributeData)) {
         std::cerr << "Failed to setup scene on GPUs!" << std::endl;
-        return -1;
+        return;
     }
     
     // Render-Parameter
@@ -131,6 +132,4 @@ int main(int argc, char** argv) {
     context.cleanup();
     
     std::cout << "Programm erfolgreich beendet." << std::endl;
-    
-    return 0;
 }
