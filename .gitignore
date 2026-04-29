@@ -1,7 +1,48 @@
-# Don't track content of these folders
+```
+# Build artifacts
+CMakeFiles/
+cmake-build-*/
+Makefile
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+build/
+dist/
 
-.vs/
-build/*
+# Dependencies
+vendor/
+third-party/
 
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS
 .DS_Store
-.idea
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# CMake
+CMakeCache.txt
+cmake_install.cmake
+```
