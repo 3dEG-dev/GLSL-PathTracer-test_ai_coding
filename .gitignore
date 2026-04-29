@@ -1,73 +1,47 @@
 ```
-# CMake build artifacts
-build/
-CMakeCache.txt
-CMakeFiles/
-
-# Compiled object files
+# Compiled and build artifacts
 *.o
 *.obj
-*.a
-*.lib
-*.so
-*.dylib
-*.dll
-
-# Executables
-*.exe
 *.out
+*.dll
+*.so
+*.a
+*.class
+*.pyc
+__pycache__/
 
-# Debug and release builds
-Debug/
-Release/
-RelWithDebInfo/
-MinSizeRel/
-
-# IDE specific files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Log files
-*.log
-
-# Temporary files
-*.tmp
-
-# Environment files
+# Dependencies
+node_modules/
+venv/
+.venv/
 .env
 .env.local
 *.env.*
 
-# Coverage reports
+# Build directories
+build/
+dist/
+target/
+.gradle/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and coverage
+*.log
 coverage/
 htmlcov/
 .coverage
 
-# MyPy cache
-.mypy_cache/
-
-# PyTest cache
-.pytest_cache/
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Distribution artifacts
-dist/
-*.egg-info/
-
-# Gradle
-.gradle/
-
-# Target directory (Rust, etc.)
-target/
-
-# Compressed archives
+# Compressed files
 *.zip
 *.gz
 *.tar
