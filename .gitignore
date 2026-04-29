@@ -1,13 +1,1 @@
-```
-# Build artifacts
-vulkan_multi_gpu/build/
-# Compiled objects
-*.o
-*.obj
-*.out
-# CMake files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-```
+Nothing should be ignored in this case, as only a source code file (`vulkan_multi_gpu/src/multi_gpu_manager.cpp`) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
