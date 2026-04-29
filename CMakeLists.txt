@@ -62,8 +62,14 @@ set(SDL2_LIBRARIES "SDL2" "SDL2main")
 set(SDL2_INCLUDE_DIRS  ${CMAKE_SOURCE_DIR}/thirdparty/SDL2/include)
 set(SDL2_LIBDIR ${CMAKE_SOURCE_DIR}/thirdparty/SDL2/lib/x64)
 endif()
+# OpenImageDenoise temporarily disabled on Linux - Windows binaries only
+if(WIN32)
 set(OIDN_LIBRARIES "OpenImageDenoise")
 set(OIDN_LIBDIR ${CMAKE_SOURCE_DIR}/thirdparty/oidn/lib)
+else()
+set(OIDN_LIBRARIES "")
+set(OIDN_LIBDIR "")
+endif()
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/core
