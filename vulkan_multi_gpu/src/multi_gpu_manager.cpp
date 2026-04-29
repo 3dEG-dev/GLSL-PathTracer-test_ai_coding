@@ -152,14 +152,15 @@ bool MultiGPUManager::initialize(VulkanContext& context, const std::vector<uint3
         
         DeviceInfo info = availableDevices[index];
         
-        // Device erstellen
+        // Device erstellen - dies modifiziert 'info' und setzt info.device
         if (!context.createDevice(info)) {
             std::cerr << "Failed to create device for GPU " << index << std::endl;
             continue;
         }
         
         GPURenderResources resources;
-        resources.deviceInfo = vulkanContext->getDevices()[index];  // Copy instead of pointer
+        // Verwende das aktualisierte 'info' mit dem erstellten Device, nicht die Kopie aus dem Context!
+        resources.deviceInfo = info;
         
         // Command Pool erstellen
         resources.commandPool = context.createCommandPool(
