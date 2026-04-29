@@ -8,6 +8,9 @@
 
 namespace vkpt {
 
+// Forward declaration for compute shader source
+const char* getComputeShaderSource();
+
 MultiGPUManager::MultiGPUManager() 
     : vulkanContext(nullptr), initialized(false) {}
 
@@ -267,6 +270,14 @@ bool MultiGPUManager::setupScene(const std::vector<Sphere>& spheres,
         return false;
     }
     
+    // Create output images and uniform buffers for all GPUs first (needed before descriptor set creation)
+    // Note: Actual image size will be set in renderFrame, using placeholder here
+    for (auto& resources : gpuResources) {
+        // Output image will be created in renderFrame with correct dimensions
+        resources.outputImage = VK_NULL_HANDLE;
+        resources.uniformBuffer = VK_NULL_HANDLE;
+    }
+    
     if (distributeAcrossGPUs && gpuResources.size() > 1) {
         distributeSceneData(spheres, materials);
     } else {
@@ -486,6 +497,40 @@ void MultiGPUManager::renderFrame(uint32_t imageWidth, uint32_t imageHeight, int
             continue;
         }
         
+        // Pipeline und DescriptorSet initialisieren falls noch nicht geschehen
+        if (resources.pipelineLayout == VK_NULL_HANDLE || resources.descriptorSet == VK_NULL_HANDLE) {
+            std::cout << "  Initializing compute pipeline for GPU " << resources.deviceInfo.deviceId << std::endl;
+            
+            // Ensure output image and uniform buffer exist
+            if (resources.outputImage == VK_NULL_HANDLE) {
+                if (!createOutputImage(resources, imageWidth, imageHeight)) {
+                    std::cerr << "Failed to create output image for GPU " << resources.deviceInfo.deviceId << std::endl;
+                    continue;
+                }
+            }
+            
+            if (resources.uniformBuffer == VK_NULL_HANDLE) {
+                if (!createUniformBuffer(resources, imageWidth, imageHeight)) {
+                    std::cerr << "Failed to create uniform buffer for GPU " << resources.deviceInfo.deviceId << std::endl;
+                    continue;
+                }
+            }
+            
+            // Create descriptor set layout and pool
+            if (!createDescriptorSet(resources)) {
+                std::cerr << "Failed to create descriptor set for GPU " << resources.deviceInfo.deviceId << std::endl;
+                continue;
+            }
+            
+            // Create compute pipeline (using dummy shader code for now)
+            // In production: compile shaderSource to SPIR-V and pass the compiled code
+            std::vector<uint32_t> dummyShaderCode(16, 0); // Placeholder
+            if (!createComputePipeline(resources, dummyShaderCode)) {
+                std::cerr << "Failed to create compute pipeline for GPU " << resources.deviceInfo.deviceId << std::endl;
+                continue;
+            }
+        }
+        
         VkDevice device = resources.deviceInfo.device;
         VkQueue queue = resources.deviceInfo.computeQueue;
         
@@ -531,9 +576,14 @@ void MultiGPUManager::renderFrame(uint32_t imageWidth, uint32_t imageHeight, int
         // Bind Pipeline
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, resources.computePipeline);
         
-        // Bind Descriptor Sets
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
-                               resources.pipelineLayout, 0, 1, &resources.descriptorSet, 0, nullptr);
+        // Bind Descriptor Sets - with null check for safety
+        if (resources.pipelineLayout != VK_NULL_HANDLE && resources.descriptorSet != VK_NULL_HANDLE) {
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
+                                   resources.pipelineLayout, 0, 1, &resources.descriptorSet, 0, nullptr);
+        } else {
+            std::cerr << "Warning: pipelineLayout or descriptorSet is null for GPU " 
+                      << resources.deviceInfo.deviceId << std::endl;
+        }
         
         // Für jedes Tile einen Dispatch machen
         for (const auto& tile : resources.assignedTiles) {
