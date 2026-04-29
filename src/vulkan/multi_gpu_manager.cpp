@@ -504,7 +504,8 @@ void MultiGPUManager::renderFrame(uint32_t imageWidth, uint32_t imageHeight, int
         }
         
         // Pipeline und DescriptorSet initialisieren falls noch nicht geschehen
-        if (resources.pipelineLayout == VK_NULL_HANDLE || resources.descriptorSet == VK_NULL_HANDLE) {
+        if (resources.pipelineLayout == VK_NULL_HANDLE || resources.descriptorSet == VK_NULL_HANDLE || 
+            resources.descriptorSetLayout == VK_NULL_HANDLE || resources.computePipeline == VK_NULL_HANDLE) {
             std::cout << "  Initializing compute pipeline for GPU " << resources.deviceInfo.deviceId << std::endl;
             
             // Ensure output image and uniform buffer exist
